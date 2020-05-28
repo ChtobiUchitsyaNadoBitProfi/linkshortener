@@ -1,4 +1,5 @@
 {
 	"mongoUri": "mongodb+srv://ivan:w99i3zqr8@cluster0-tmttb.azure.mongodb.net/app?retryWrites=true&w=majority",
+	"jwtSecret": "geegun",
 	"port": 5000
 }
