@@ -10,7 +10,7 @@ router.post(
 		check('email', 'Некорpектный email').IsEmail(),
 		check('password', 'Минимальная длинна пароля 6 шесть символов')
 			.isLength( { min: 6 } )
-	]
+	],
 	async (reg, res) => {
 	try {
 		const errors = validationResult(req)
@@ -42,8 +42,44 @@ router.post(
 	}
 })
 
-router.post('/rlogin', async (reg, res) => {
 
+// /api/auth/login
+router.post(
+	'/login',
+	[
+		check('email', 'Введите корректный email').normalizeEmail().isEmail(),
+		check('password', 'Введите пароль').exists()
+	],
+	async (reg, res) => {
+	try {
+		const errors = validationResult(req)
+
+		if (!errors.isEmpty) {
+			return res.status(400).json({
+				errors: errors.array(),
+				message: 'Некорpектные данные при входе в систему'
+			})
+		}
+
+		const {email, password} = req.body
+
+		const user = await User.findOne({ email })
+
+		if (!user) {
+			return res.status(400).json({ message: 'Пользователь ненайден'})
+		}
+
+		const isMatch = await bcrypt.compare(password, user.password)
+
+		if (!isMatch) {
+			return res.status(400).json({ message: 'Неверный пароль, попробуйте снова'})
+		}
+
+
+		
+	} catch (e) {
+		res.status(500).json({message: 'Что-то пошло не так, попробуйте снова'})
+	}
 })
 
 module.exports = router
